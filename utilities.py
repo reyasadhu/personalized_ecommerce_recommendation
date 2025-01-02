@@ -20,11 +20,12 @@ def get_product_features(dataset):
         "parent_level_2": x["parent_level_2"],
         "parent_level_3": x["parent_level_3"],
         "parent_level_4": x["parent_level_4"],
-        "parent_level_5": x["parent_level_5"],
-        "item_number_of_views": x["item_number_of_views"],
-        "item_number_of_purchases": x["item_number_of_purchases"],
-        "item_number_of_addtocart": x["item_number_of_addtocart"],
-        "number_of_unique_visitors": x["number_of_unique_visitors"]})
+        "parent_level_5": x["parent_level_5"]
+        # "item_number_of_views": x["item_number_of_views"],
+        # "item_number_of_purchases": x["item_number_of_purchases"],
+        # "item_number_of_addtocart": x["item_number_of_addtocart"],
+        # "number_of_unique_visitors": x["number_of_unique_visitors"]
+        })
     return product_features
 
 

@@ -26,7 +26,10 @@ def preprocess_data():
     events = events.drop(['transactionid'],axis=1)
     events=events.drop_duplicates()
     item_properties = item_properties.drop_duplicates()
-    events['timestamp']= events['timestamp'].apply(lambda x:datetime.fromtimestamp(x/1000))
+    events['timestamp_raw'] = events['timestamp']
+    events['timestamp'] = events['timestamp'].apply(lambda x:datetime.fromtimestamp(x/1000))
+    # print(events['timestamp_raw'].min(), events['timestamp_raw'].max())
+    item_properties['timestamp_raw'] = item_properties['timestamp']
     item_properties['timestamp']= item_properties['timestamp'].apply(lambda x:datetime.fromtimestamp(x/1000))
 
     #Check if all the items has all 1104 properties in the training data
@@ -60,6 +63,24 @@ def preprocess_data():
     # category_tree_df['categoryid'] = category_tree_df['categoryid'].astype(int)
     category_tree_df = merge_with_category_paths(category_tree_df, category_tree)
 
+    # Adding user activity features
+    events = events.sort_values(by=["visitorid", "timestamp"]).reset_index(drop=True)
+    events['user_number_of_views'] = events.groupby('visitorid').cumcount()
+    events['user_number_of_addtocart'] = events[events['event'] == 'addtocart'].groupby('visitorid').cumcount()
+    events['user_number_of_purchases'] = events[events['event'] == 'transaction'].groupby('visitorid').cumcount()
+    def unique_items_up_to_now(group):
+        seen_items = set()
+        result = []
+        for item in group:
+            result.append(len(seen_items))  # Count items before adding the current one
+            seen_items.add(item)
+        return result   
+
+    events["number_of_unique_items"] = (events.groupby("visitorid")["itemid"].transform(unique_items_up_to_now))
+    events['user_number_of_views'] = events.groupby('visitorid')['user_number_of_views'].ffill().fillna(0).astype(int)
+    events['user_number_of_addtocart'] = events.groupby('visitorid')['user_number_of_addtocart'].ffill().fillna(0).astype(int)
+    events['user_number_of_purchases'] = events.groupby('visitorid')['user_number_of_purchases'].ffill().fillna(0).astype(int)
+
     #Splitting by time
     cutoff_time = pd.to_datetime('2015-08-01')
     events_train = events[events['timestamp']<=cutoff_time]
@@ -76,10 +97,8 @@ def preprocess_data():
 
 
     #We are preprocessing the data separately to avoid any data leakage
-    popularity_item = process_popularity(events_train, level = "itemid")
-    popularity_user = process_popularity(events_train, level = "visitorid")     
+    popularity_item = process_popularity(events_train, level = "itemid")   
     popularity_item.to_csv("processed_data/popularity_item.csv", index=False)
-    popularity_user.to_csv("processed_data/popularity_user.csv", index=False)
 
     #Make each property to a column
     item_properties_train = item_properties_train.pivot(index=['itemid','timestamp'], columns='property', values='value')
@@ -155,6 +174,7 @@ def preprocess_data():
                                 direction='nearest')
     
     del item_properties_train
+
 
     item_properties = item_properties.sort_values('timestamp')
     item_properties = item_properties.groupby(['itemid']).last().reset_index()
