@@ -50,13 +50,25 @@ This project implements and evaluates several baseline recommendation approaches
 - Item-Item Collaborative Filtering: Finds items similar to those the user has already interacted with and ranks them based on similarity.
 - Singular Value Decomposition (SVD): A matrix factorization technique used to predict missing values in the interaction matrix.
 
-### Key Findings
-1. Popular items baseline performs poorly, indicating personalization is important.
-2. Recently Viewed Items performs best for immediate recommendations (P@1)
-3. Item-Item CF shows best overall recall.
-5. Event weighting (view=1, cart=2, purchase=3) improves collaborative filtering performance
-
 ### Implementation Details
 - Uses sparse matrices for efficient computation
 - Implements cosine similarity for user/item similarity
 - Evaluates with Recall@K metric
+
+### Key Findings
+1. Popular items baseline performs poorly, indicating personalization is important.
+2. Recently Viewed Items performs best for immediate recommendations (P@1)
+3. Item-Item CF shows best overall recall.
+
+## Results
+The two-tower approach treats all user-item interactions equally, without distinguishing between specific interaction types. In the user tower, it leverages generalized user behavior, such as the total number of views or purchases, rather than item-specific purchase history.
+
+| Model       | Recall@50      |
+|-------------|----------------|
+| Baseline    | 0.25 |
+| Two-Tower (Exact KNN)   | 0.15 |
+
+In the current version, I plan to utilize an RNN to generate embeddings that capture product-specific user history for each user. This approach is expected to enhance the quality of recommendations by leveraging sequential patterns in user behavior.
+
+
+
