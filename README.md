@@ -3,7 +3,7 @@ A retrieval based recommendation system with two tower architecture
 
 ## Key Features
 - Two-tower architecture for scalable recommendations
-- Multi-modal feature processing (categorical, numerical, temporal)
+- Multi-modal feature processing (textual, categorical, numerical, temporal)
 - Efficient embedding layers for sparse features
 - User interaction history integration
 - Representing user and item embedding in same vector space for approximate KNN search
@@ -28,7 +28,7 @@ pip install -r requirements.txt
 - Processes item features through embedding layers
 - Handles features like:
   - Property_1 through Property_11: These are item metadata, where the texts are hashed. Some of the properties are numeric, where the rest are used by textvectorization.
-  - Category IDs: Category of an utem
+  - Category IDs: Category of an item
   - Parent level hierarchies: Hierarchical categories are embedded to capture item relationships
 
 ### User Tower
@@ -42,22 +42,21 @@ pip install -r requirements.txt
 The raw data can be downloaded from here https://www.kaggle.com/datasets/retailrocket/ecommerce-dataset/data
 Save the data in a folder raw_data to run the code.
 
-
 ## Baseline Model
 This project implements and evaluates several baseline recommendation approaches:
-Recently Viewed Items: Recommends items a user has recently viewed, ranked based on how recently they were interacted with.
-Most Popular Items: Suggests the most frequently interacted-with items, ranked by their overall popularity.
-User-User Collaborative Filtering: Identifies 10 similar users using cosine similarity and recommends items they have interacted with, ranked by interaction frequency or type.
-Item-Item Collaborative Filtering: Finds items similar to those the user has already interacted with and ranks them based on similarity.
-Singular Value Decomposition (SVD): A matrix factorization technique used to predict missing values in the interaction matrix.
+- Most Popular Items: Suggests the most frequently interacted-with items, ranked by their overall popularity.
+- Recently Viewed Items: Recommends items a user has recently viewed, ranked based on how recently they were interacted with.
+- User-User Collaborative Filtering: Identifies 10 similar users using cosine similarity and recommends items they have interacted with, ranked by interaction frequency or type.
+- Item-Item Collaborative Filtering: Finds items similar to those the user has already interacted with and ranks them based on similarity.
+- Singular Value Decomposition (SVD): A matrix factorization technique used to predict missing values in the interaction matrix.
 
-## Key Findings
-1. Recently Viewed Items performs best for immediate recommendations (P@1)
-2. Item-Item CF shows best overall recall@10
-3. Popular items baseline performs poorly, indicating personalization is important
-4. Event weighting (view=1, cart=2, purchase=3) improves collaborative filtering performance
+### Key Findings
+1. Popular items baseline performs poorly, indicating personalization is important.
+2. Recently Viewed Items performs best for immediate recommendations (P@1)
+3. Item-Item CF shows best overall recall.
+5. Event weighting (view=1, cart=2, purchase=3) improves collaborative filtering performance
 
-## Implementation Details
+### Implementation Details
 - Uses sparse matrices for efficient computation
 - Implements cosine similarity for user/item similarity
 - Evaluates with Recall@K metric
