@@ -41,7 +41,6 @@ class TwoTowerModel(tfrs.models.Model):
     # Passing the embeddings into the loss function
     user_embeddings = self.query_model({
                                     "visitorid": features["visitorid"],
-                                    # "event": features["event"],
                                     "timestamp_raw": features["timestamp_raw"],
                                     "user_number_of_views": features["user_number_of_views"],
                                     "user_number_of_addtocart": features["user_number_of_addtocart"],
@@ -64,17 +63,12 @@ class TwoTowerModel(tfrs.models.Model):
          "property_9": features["property_9"], 
          "property_10": features["property_10"], 
          "property_11": features["property_11"], 
-        #  "available": features["available"],
          "categoryid": features["categoryid"],
          "parent_level_1": features["parent_level_1"],
          "parent_level_2": features["parent_level_2"],
          "parent_level_3": features["parent_level_3"],
          "parent_level_4": features["parent_level_4"],
          "parent_level_5": features["parent_level_5"]
-        #  "item_number_of_views": features["item_number_of_views"],
-        #  "item_number_of_addtocart": features["item_number_of_addtocart"],
-        #  "item_number_of_purchases": features["item_number_of_purchases"],
-        #  "number_of_unique_visitors": features["number_of_unique_visitors"]
          })
 
 
