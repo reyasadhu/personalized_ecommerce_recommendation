@@ -20,9 +20,6 @@ class ItemModel(tf.keras.Model):
     self.products_vocab = layers.StringLookup(mask_token=None)
     self.products_vocab.adapt(self.dataset.map(lambda x: x["itemid"]))
 
-    # # Availibility
-    # self.product_availability = layers.CategoryEncoding(num_tokens=2, output_mode="one_hot")
-
     # category
     self.category_vocab = layers.StringLookup(mask_token=None)
     self.category_vocab.adapt(self.dataset.map(lambda x: tf.strings.as_string(x['categoryid'])))
@@ -41,26 +38,6 @@ class ItemModel(tf.keras.Model):
 
     self.parent5_vocab = layers.StringLookup(mask_token=None)
     self.parent5_vocab.adapt(self.dataset.map(lambda x: tf.strings.as_string(x['parent_level_5'])))
-
-    # # Sales
-    # self.product_sales_norm = layers.Normalization(axis=None)
-    # self.sales = np.concatenate(list(self.dataset.map(lambda x: x["item_number_of_purchases"]).batch(1000)))
-    # self.product_sales_norm.adapt(self.sales)
-
-    # # Views
-    # self.product_views_norm = layers.Normalization(axis=None)
-    # self.views = np.concatenate(list(self.dataset.map(lambda x: x["item_number_of_views"]).batch(1000)))
-    # self.product_views_norm.adapt(self.views)
-
-    # # Addto-carts
-    # self.product_carts_norm = layers.Normalization(axis=None)
-    # self.carts = np.concatenate(list(self.dataset.map(lambda x: x["item_number_of_addtocart"]).batch(1000)))
-    # self.product_carts_norm.adapt(self.carts)
-
-    # # users
-    # self.product_n_users_norm = layers.Normalization(axis=None)
-    # self.n_users = np.concatenate(list(self.dataset.map(lambda x: x["number_of_unique_visitors"]).batch(1000)))
-    # self.product_n_users_norm.adapt(self.n_users)
 
     # Product properties
     self.max_features = 10000
@@ -119,10 +96,6 @@ class ItemModel(tf.keras.Model):
     self.product_embedding.add(self.products_vocab)
     self.product_embedding.add(layers.Embedding(self.products_vocab.vocabulary_size(), self.embedding_dim, embeddings_initializer='normal'))
 
-    # # Availibility
-    # self.availability = models.Sequential()
-    # self.availability.add(self.product_availability)
-
     # Product Category
     self.category = models.Sequential()
     self.category.add(self.category_vocab)
@@ -148,23 +121,6 @@ class ItemModel(tf.keras.Model):
     self.type5_embedding.add(self.parent5_vocab)
     self.type5_embedding.add(layers.Embedding(self.parent5_vocab.vocabulary_size(), self.embedding_dim, embeddings_initializer='normal'))
 
-    # # Sales
-    # self.sales = models.Sequential()
-    # self.sales.add(self.product_sales_norm)
-
-    # # Views
-    # self.views = models.Sequential()
-    # self.views.add(self.product_views_norm)
-
-    # # Carts
-    # self.carts = models.Sequential()
-    # self.carts.add(self.product_carts_norm)
-
-    # # Users
-    # self.users = models.Sequential()
-    # self.users.add(self.product_n_users_norm)
-
-    
     # Product properties
     self.property1_embedding = models.Sequential()
     self.property1_embedding.add(layers.Input(shape=(None,)))
@@ -219,17 +175,12 @@ class ItemModel(tf.keras.Model):
   def call(self, inputs):
       return tf.concat([
           self.product_embedding(inputs["itemid"]),
-          # self.availability(inputs["available"]),
           self.category(inputs["categoryid"]),
           self.type1_embedding(inputs["parent_level_1"]),
           self.type2_embedding(inputs["parent_level_2"]),
           self.type3_embedding(inputs["parent_level_3"]),
           self.type4_embedding(inputs["parent_level_4"]),
           self.type5_embedding(inputs["parent_level_5"]),
-          # tf.reshape(self.sales(inputs["item_number_of_purchases"]), (-1, 1)),
-          # tf.reshape(self.views(inputs["item_number_of_views"]), (-1, 1)),
-          # tf.reshape(self.carts(inputs["item_number_of_addtocart"]), (-1, 1)),
-          # tf.reshape(self.users(inputs["number_of_unique_visitors"]), (-1, 1)),
           self.property1_embedding(self.product_property1_vocab(inputs["property_1"])),
           self.property2_embedding(self.product_property2_vocab(inputs["property_2"])),
           self.property3_embedding(self.product_property3_vocab(inputs["property_3"])),
